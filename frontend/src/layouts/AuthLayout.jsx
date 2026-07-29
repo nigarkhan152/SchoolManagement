@@ -1,4 +1,4 @@
-import LeftPanel from "../components/layout/LeftPanel";
+import LeftPanel from "../pages/auth/LeftPanel";
 
 const AuthLayout = ({ children }) => {
   return (
