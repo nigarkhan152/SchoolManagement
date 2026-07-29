@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import routes from "./routes/index.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./app/config/swagger.js";
 const app = express();
 
 app.use(helmet());
@@ -12,5 +14,9 @@ app.use("/api/v1",routes);
 app.get("/", (req, res) => {
     res.send("School ERP Backend Running 🚀");
 });
-
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec)
+);
 export default app;
