@@ -11,6 +11,7 @@ import Button from "../../components/common/Button";
 import useClasses from "../../hooks/useClasses";
 import Modal from "../../components/common/Modal";
 import ClassForm from "../../components/forms/ClassForm";
+import SectionList from "../../components/sections/SectionList";
 import { useState } from "react";
 import { BookOpen, GraduationCap, Users, BarChart3 } from "lucide-react";
 const ClassesPage = () => {
@@ -243,8 +244,7 @@ const ClassesPage = () => {
 
             {/* Sections */}
 
-            <div>
-
+            {/* <div>
               <h3 className="mb-3 text-lg font-semibold">
                 Sections
               </h3>
@@ -297,8 +297,13 @@ const ClassesPage = () => {
 
               )}
 
-            </div>
-
+            </div> */}
+            <SectionList
+                sections={selectedClass.sections || []}
+                onAddSection={() => {}}
+                onEditSection={() => {}}
+                onDeleteSection={() => {}}
+            />
           </div>
         )}
       </Drawer>
