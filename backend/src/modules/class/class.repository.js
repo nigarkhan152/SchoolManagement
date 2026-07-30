@@ -76,6 +76,12 @@ class ClassRepository {
   // SECTION
   // ==========================
 
+  async hasSections(classId) {
+    return await Section.exists({
+      classId,
+      isDeleted: false,
+    });
+  }
   async createSection(data) {
     return await Section.create(data);
   }

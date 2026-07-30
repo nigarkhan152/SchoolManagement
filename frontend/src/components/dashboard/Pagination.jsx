@@ -1,54 +1,54 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
 const Pagination = ({
-  currentPage,
-  totalPages,
-  onPageChange,
+  page = 1,
+  totalPages = 1,
+  hasNext = false,
+  hasPrevious = false,
+  onNext,
+  onPrevious,
 }) => {
-  if (totalPages <= 1) return null;
-
-  const pages = Array.from(
-    { length: totalPages },
-    (_, i) => i + 1
-  );
-
   return (
-    <div className="mt-6 flex items-center justify-between">
+    <div className="flex items-center justify-between border-t border-slate-200 pt-5">
+      <p className="text-sm text-slate-500">
+        Page {page} of {totalPages}
+      </p>
 
-      <button
-        disabled={currentPage === 1}
-        onClick={() => onPageChange(currentPage - 1)}
-        className="flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        <ChevronLeft size={16} />
-        Previous
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={onPrevious}
+          disabled={!hasPrevious}
+          className="
+            rounded-lg
+            border
+            border-slate-300
+            px-4
+            py-2
+            text-sm
+            disabled:cursor-not-allowed
+            disabled:opacity-50
+            hover:bg-slate-100
+          "
+        >
+          Previous
+        </button>
 
-      <div className="flex items-center gap-2">
-        {pages.map((page) => (
-          <button
-            key={page}
-            onClick={() => onPageChange(page)}
-            className={`h-9 w-9 rounded-lg text-sm transition ${
-              currentPage === page
-                ? "bg-blue-600 text-white"
-                : "border border-slate-300 hover:bg-slate-100"
-            }`}
-          >
-            {page}
-          </button>
-        ))}
+        <button
+          onClick={onNext}
+          disabled={!hasNext}
+          className="
+            rounded-lg
+            bg-blue-600
+            px-4
+            py-2
+            text-sm
+            text-white
+            disabled:cursor-not-allowed
+            disabled:opacity-50
+            hover:bg-blue-700
+          "
+        >
+          Next
+        </button>
       </div>
-
-      <button
-        disabled={currentPage === totalPages}
-        onClick={() => onPageChange(currentPage + 1)}
-        className="flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        Next
-        <ChevronRight size={16} />
-      </button>
-
     </div>
   );
 };
