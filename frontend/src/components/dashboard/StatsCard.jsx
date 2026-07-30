@@ -1,30 +1,75 @@
-import React from "react";
+import { motion } from "framer-motion";
 
-const StatsCard = ({ title, value, subtitle, icon }) => {
+const StatsCard = ({
+  title,
+  value,
+  subtitle,
+  icon,
+  iconBg = "bg-blue-100",
+  iconColor = "text-blue-600",
+}) => {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-slate-500">{title}</p>
+    <motion.div
+      whileHover={{
+        y: -4,
+        transition: { duration: 0.2 },
+      }}
+      className="
+        rounded-2xl
+        border
+        border-slate-100
+        bg-white
+        p-6
+        shadow-sm
+        transition-all
+        duration-300
+        hover:shadow-lg
+      "
+    >
+      <div className="flex items-start justify-between">
 
-          <h2 className="mt-2 text-3xl font-bold text-slate-800">
+        {/* Left Side */}
+
+        <div className="space-y-2">
+
+          <p className="text-sm font-medium text-slate-500">
+            {title}
+          </p>
+
+          <h2 className="text-4xl font-bold text-slate-800">
             {value}
           </h2>
 
           {subtitle && (
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="text-sm text-slate-400">
               {subtitle}
             </p>
           )}
+
         </div>
 
+        {/* Icon */}
+
         {icon && (
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-            {icon}
+          <div
+            className={`
+              flex
+              h-14
+              w-14
+              items-center
+              justify-center
+              rounded-2xl
+              ${iconBg}
+            `}
+          >
+            <div className={`text-2xl ${iconColor}`}>
+              {icon}
+            </div>
           </div>
         )}
+
       </div>
-    </div>
+    </motion.div>
   );
 };
 

@@ -12,7 +12,7 @@ import useClasses from "../../hooks/useClasses";
 import Modal from "../../components/common/Modal";
 import ClassForm from "../../components/forms/ClassForm";
 import { useState } from "react";
-
+import { BookOpen, GraduationCap, Users, BarChart3 } from "lucide-react";
 const ClassesPage = () => {
   const {
     classes,
@@ -50,35 +50,52 @@ const ClassesPage = () => {
 
       <PageHeader
         title="Class Management"
-        subtitle="Create, update and manage all classes."
+        subtitle="Create, update and manage all classes in your school."
+        breadcrumb="Home / Classes"
         buttonText="Create Class"
         onButtonClick={() => {
-        setSelectedClass(null);
-        setModalOpen(true);
+          setSelectedClass(null);
+          setModalOpen(true);
         }}
       />
 
       {/* ================= Stats ================= */}
 
-      <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
         <StatsCard
           title="Total Classes"
           value={stats.totalClasses ?? 0}
+          subtitle="All Classes"
+          icon={<BookOpen size={28} />}
+          iconBg="bg-blue-100"
+          iconColor="text-blue-600"
         />
 
         <StatsCard
           title="Active Classes"
           value={stats.activeClasses ?? 0}
+          subtitle="Running Classes"
+          icon={<GraduationCap size={28} />}
+          iconBg="bg-violet-100"
+          iconColor="text-violet-600"
         />
 
         <StatsCard
           title="Total Sections"
           value={stats.totalSections ?? 0}
+          subtitle="All Sections"
+          icon={<Users size={28} />}
+          iconBg="bg-green-100"
+          iconColor="text-green-600"
         />
 
         <StatsCard
           title="Students"
           value={stats.studentsEnrolled ?? 0}
+          subtitle="Across Classes"
+          icon={<BarChart3 size={28} />}
+          iconBg="bg-orange-100"
+          iconColor="text-orange-600"
         />
       </div>
 
@@ -91,6 +108,7 @@ const ClassesPage = () => {
           <SearchBar
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            onClear={() => setSearch("")}
             placeholder="Search classes..."
           />
 
@@ -122,7 +140,7 @@ const ClassesPage = () => {
 
         {/* ================= Pagination ================= */}
 
-        <div className="mt-6">
+        <div className="flex justify-center">
 
           <Pagination
             page={pagination.page}
