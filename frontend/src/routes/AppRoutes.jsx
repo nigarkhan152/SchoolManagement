@@ -3,7 +3,7 @@ import LoginPage from "../pages/auth/LoginPage";
 import ProtectedRoute from "./ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
 import DashboardHome from "../pages/dashboard/DashboardHome";
-
+import ClassesPage from "../pages/classes/ClassesPage";
 const AppRoutes = () => {
   return (
     <BrowserRouter>
@@ -20,6 +20,7 @@ const AppRoutes = () => {
           }
         >
           <Route path="/dashboard" element={<DashboardHome />} />
+          <Route path="/classes" element={<ClassesPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

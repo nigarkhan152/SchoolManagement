@@ -15,11 +15,10 @@ class ClassService {
   async createClass(data) {
     createClassValidation(data);
 
-    const exists =
-      await ClassRepository.classExists(
-        data.name,
-        data.academicYear
-      );
+    const exists = await ClassRepository.classExists(
+      data.name,
+      data.academicYear
+    );
 
     if (exists) {
       throw new Error(
@@ -39,52 +38,66 @@ class ClassService {
       academicYear,
     } = query;
 
-    const filters = {
-      isDeleted: false,
-    };
+    const filters = {};
 
     if (search) {
-      filters.name = {
-        $regex: search,
-        $options: "i",
-      };
+      filters.$or = [
+        {
+          name: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          description: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          roomNumber: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+      ];
     }
 
     if (academicYear) {
       filters.academicYear = academicYear;
     }
 
-    if (status !== undefined) {
+    if (status) {
       filters.isActive = status === "active";
     }
 
-    const skip =
-      (Number(page) - 1) * Number(limit);
+    const pageNumber = Number(page);
+    const pageSize = Number(limit);
 
-    const data =
-      await ClassRepository.getClasses(
-        filters,
-        skip,
-        Number(limit),
-        {
-          createdAt: -1,
-        }
-      );
+    const skip = (pageNumber - 1) * pageSize;
 
-    const total =
-      await ClassRepository.countClasses(
-        filters
-      );
+    const data = await ClassRepository.getClasses(
+      filters,
+      skip,
+      pageSize,
+      {
+        createdAt: -1,
+      }
+    );
+
+    const total = await ClassRepository.countClasses(
+      filters
+    );
 
     return {
       data,
       pagination: {
+        page: pageNumber,
+        limit: pageSize,
         total,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(
-          total / Number(limit)
-        ),
+        totalPages: Math.ceil(total / pageSize),
+        hasNext: pageNumber < Math.ceil(total / pageSize),
+        hasPrevious: pageNumber > 1,
       },
     };
   }
@@ -123,14 +136,23 @@ class ClassService {
   }
 
   async deleteClass(id) {
-    const deleted =
-      await ClassRepository.deleteClass(id);
+    const classData =
+      await ClassRepository.getClassById(id);
 
-    if (!deleted) {
+    if (!classData) {
       throw new Error("Class not found");
     }
 
-    return deleted;
+    const hasSections =
+      await ClassRepository.hasSections(id);
+
+    if (hasSections) {
+      throw new Error(
+        "Cannot delete class because it contains sections."
+      );
+    }
+
+    return await ClassRepository.deleteClass(id);
   }
 
   // ======================

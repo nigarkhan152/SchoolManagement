@@ -1,169 +1,117 @@
 import ClassService from "./class.service.js";
+import asyncHandler from "../../app/utils/asyncHandler.js";
+import { successResponse } from "../../app/utils/apiResponse.js";
+
 class ClassController {
   // ===========================
   // CLASS
   // ===========================
 
-  async createClass(req, res) {
-    try {
-      const data = await ClassService.createClass(req.body);
+  createClass = asyncHandler(async (req, res) => {
+    const data = await ClassService.createClass(req.body);
 
-      return res.status(201).json({
-        success: true,
-        message: "Class created successfully",
-        data,
-      });
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+    return successResponse(
+      res,
+      "Class created successfully",
+      data,
+      201
+    );
+  });
 
-  async getClasses(req, res) {
-    try {
-      const data = await ClassService.getClasses(req.query);
+  getClasses = asyncHandler(async (req, res) => {
+    const data = await ClassService.getClasses(req.query);
 
-      return res.status(200).json({
-        success: true,
-        data,
-      });
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+    return successResponse(
+      res,
+      "Classes fetched successfully",
+      data
+    );
+  });
 
-  async getClassById(req, res) {
-    try {
-      const data = await ClassService.getClassById(req.params.id);
+  getClassById = asyncHandler(async (req, res) => {
+    const data = await ClassService.getClassById(req.params.id);
 
-      return res.status(200).json({
-        success: true,
-        data,
-      });
-    } catch (error) {
-      return res.status(404).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+    return successResponse(
+      res,
+      "Class fetched successfully",
+      data
+    );
+  });
 
-  async updateClass(req, res) {
-    try {
-      const data = await ClassService.updateClass(
-        req.params.id,
-        req.body
-      );
+  updateClass = asyncHandler(async (req, res) => {
+  console.log("Params:", req.params);
+  console.log("Body:", req.body);
 
-      return res.status(200).json({
-        success: true,
-        message: "Class updated successfully",
-        data,
-      });
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+  const data = await ClassService.updateClass(
+    req.params.id,
+    req.body
+  );
 
-  async deleteClass(req, res) {
-    try {
-      await ClassService.deleteClass(req.params.id);
+  return successResponse(
+    res,
+    "Class updated successfully",
+    data
+  );
+});
 
-      return res.status(200).json({
-        success: true,
-        message: "Class deleted successfully",
-      });
-    } catch (error) {
-      return res.status(404).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+  deleteClass = asyncHandler(async (req, res) => {
+    await ClassService.deleteClass(req.params.id);
 
-  async getStats(req, res) {
-    try {
-      const data = await ClassService.getStats();
+    return successResponse(
+      res,
+      "Class deleted successfully"
+    );
+  });
 
-      return res.status(200).json({
-        success: true,
-        data,
-      });
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+  getStats = asyncHandler(async (req, res) => {
+    const data = await ClassService.getStats();
+
+    return successResponse(
+      res,
+      "Class statistics fetched successfully",
+      data
+    );
+  });
 
   // ===========================
   // SECTION
   // ===========================
 
-  async createSection(req, res) {
-    try {
-      const data = await ClassService.createSection({
-        ...req.body,
-        classId: req.params.classId,
-      });
+  createSection = asyncHandler(async (req, res) => {
+    const data = await ClassService.createSection({
+      ...req.body,
+      classId: req.params.classId,
+    });
 
-      return res.status(201).json({
-        success: true,
-        message: "Section created successfully",
-        data,
-      });
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+    return successResponse(
+      res,
+      "Section created successfully",
+      data,
+      201
+    );
+  });
 
-  async updateSection(req, res) {
-    try {
-      const data = await ClassService.updateSection(
-        req.params.id,
-        req.body
-      );
+  updateSection = asyncHandler(async (req, res) => {
+    const data = await ClassService.updateSection(
+      req.params.id,
+      req.body
+    );
 
-      return res.status(200).json({
-        success: true,
-        message: "Section updated successfully",
-        data,
-      });
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+    return successResponse(
+      res,
+      "Section updated successfully",
+      data
+    );
+  });
 
-  async deleteSection(req, res) {
-    try {
-      await ClassService.deleteSection(req.params.id);
+  deleteSection = asyncHandler(async (req, res) => {
+    await ClassService.deleteSection(req.params.id);
 
-      return res.status(200).json({
-        success: true,
-        message: "Section deleted successfully",
-      });
-    } catch (error) {
-      return res.status(404).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+    return successResponse(
+      res,
+      "Section deleted successfully"
+    );
+  });
 }
 
 export default new ClassController();

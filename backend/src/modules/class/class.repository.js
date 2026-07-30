@@ -14,19 +14,29 @@ class ClassRepository {
     return await Class.findOne({
       _id: id,
       isDeleted: false,
-    });
+    }).lean();
   }
 
   async updateClass(id, data) {
-    return await Class.findByIdAndUpdate(id, data, {
-      new: true,
-      runValidators: true,
-    });
+    return await Class.findOneAndUpdate(
+      {
+        _id: id,
+        isDeleted: false,
+      },
+      data,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
   }
 
   async deleteClass(id) {
-    return await Class.findByIdAndUpdate(
-      id,
+    return await Class.findOneAndUpdate(
+      {
+        _id: id,
+        isDeleted: false,
+      },
       {
         isDeleted: true,
       },
@@ -37,18 +47,25 @@ class ClassRepository {
   }
 
   async getClasses(filters, skip, limit, sort) {
-    return await Class.find(filters)
+    return await Class.find({
+      ...filters,
+      isDeleted: false,
+    })
       .sort(sort)
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
   }
 
   async countClasses(filters) {
-    return await Class.countDocuments(filters);
+    return await Class.countDocuments({
+      ...filters,
+      isDeleted: false,
+    });
   }
 
   async classExists(name, academicYear) {
-    return await Class.findOne({
+    return await Class.exists({
       name,
       academicYear,
       isDeleted: false,
@@ -67,26 +84,36 @@ class ClassRepository {
     return await Section.find({
       classId,
       isDeleted: false,
-    });
+    }).lean();
   }
 
   async getSectionById(id) {
     return await Section.findOne({
       _id: id,
       isDeleted: false,
-    });
+    }).lean();
   }
 
   async updateSection(id, data) {
-    return await Section.findByIdAndUpdate(id, data, {
-      new: true,
-      runValidators: true,
-    });
+    return await Section.findOneAndUpdate(
+      {
+        _id: id,
+        isDeleted: false,
+      },
+      data,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
   }
 
   async deleteSection(id) {
-    return await Section.findByIdAndUpdate(
-      id,
+    return await Section.findOneAndUpdate(
+      {
+        _id: id,
+        isDeleted: false,
+      },
       {
         isDeleted: true,
       },
@@ -104,22 +131,21 @@ class ClassRepository {
   }
 
   async getStats() {
-    const totalClasses = await Class.countDocuments({
-      isDeleted: false,
-    });
-
-    const activeClasses = await Class.countDocuments({
-      isDeleted: false,
-      isActive: true,
-    });
-
-    const totalSections = await Section.countDocuments({
-      isDeleted: false,
-    });
+    const [totalClasses, activeClasses, totalSections] = await Promise.all([
+      Class.countDocuments({ isDeleted: false }),
+      Class.countDocuments({
+        isDeleted: false,
+        isActive: true,
+      }),
+      Section.countDocuments({
+        isDeleted: false,
+      }),
+    ]);
 
     return {
       totalClasses,
       activeClasses,
+      inactiveClasses: totalClasses - activeClasses,
       totalSections,
     };
   }
