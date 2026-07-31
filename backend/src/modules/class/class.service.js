@@ -13,21 +13,37 @@ class ClassService {
   // ======================
 
   async createClass(data) {
-    createClassValidation(data);
+  createClassValidation(data);
 
-    const exists = await ClassRepository.classExists(
+  // Check active class
+  const exists = await ClassRepository.classExists(
+    data.name,
+    data.academicYear
+  );
+
+  if (exists) {
+    throw new Error(
+      "Class already exists for this academic year."
+    );
+  }
+
+  // Check deleted class
+  const deletedClass =
+    await ClassRepository.findDeletedClass(
       data.name,
       data.academicYear
     );
 
-    if (exists) {
-      throw new Error(
-        "Class already exists for this academic year."
-      );
-    }
-
-    return await ClassRepository.createClass(data);
+  if (deletedClass) {
+    return await ClassRepository.restoreClass(
+      deletedClass._id,
+      data
+    );
   }
+
+  // Create new class
+  return await ClassRepository.createClass(data);
+}
 
   async getClasses(query) {
     const {
@@ -170,7 +186,7 @@ class ClassService {
     }
 
     const sectionName = data.name.trim().toUpperCase();
-
+    // Check active section
     const existingSection =
         await ClassRepository.findSectionByName(
             data.classId,
@@ -182,7 +198,23 @@ class ClassService {
             "Section already exists in this class."
         );
     }
-    
+    //Check deleted section
+    const deletedSection =
+    await ClassRepository.findDeletedSectionByName(
+      data.classId,
+      sectionName
+    );
+
+    if (deletedSection) {
+      return await ClassRepository.restoreSection(
+        deletedSection._id,
+        {
+          name: sectionName,
+          capacity: data.capacity,
+          isActive: true,
+        }
+      );
+    }
     data.name = sectionName;
 
     return await ClassRepository.createSection(data);

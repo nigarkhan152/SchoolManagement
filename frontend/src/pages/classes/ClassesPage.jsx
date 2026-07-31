@@ -15,7 +15,7 @@ import SectionList from "../../components/sections/SectionList";
 import { useState } from "react";
 import classService from "../../services/classService";
 import SectionForm from "../../components/sections/SectionForm";
-import { BookOpen, GraduationCap, Users, BarChart3 } from "lucide-react";
+import { BookOpen, GraduationCap, Users, BarChart3, Form } from "lucide-react";
 const ClassesPage = () => {
   const {
     classes,
@@ -49,6 +49,11 @@ const ClassesPage = () => {
   const [deleting, setDeleting] = useState(false);
   const [sectionModalOpen, setSectionModalOpen] = useState(false);
   const [sectionLoading, setSectionLoading] = useState(false);
+  const [editingSection, setEditingSection] = useState(null);
+  const [deleteSectionModalOpen, setDeleteSectionModalOpen] =
+  useState(false);
+  const [sectionToDelete, setSectionToDelete] = useState(null);
+  const [deletingSection, setDeletingSection] = useState(false);
   const handleCreateSection = async (formData) => {
     try {
       setSectionLoading(true);
@@ -73,17 +78,69 @@ const ClassesPage = () => {
       setSectionLoading(false);
     }
   };
+  const handleUpdateSection = async (formData) => {
+    try {
+      setSectionLoading(true);
+
+      await classService.updateSection(
+        editingSection._id,
+        formData
+      );
+
+      await refreshSelectedClass();
+
+      setSectionModalOpen(false);
+      setEditingSection(null);
+
+    } catch (error) {
+      const message = error.response?.data?.message ||
+      "Failed to update section.";
+      alert(message);
+    } finally {
+      setSectionLoading(false);
+    }
+  };
+  const handleDeleteSection = async () => {
+    try {
+      setDeletingSection(true);
+
+      await classService.deleteSection(
+        sectionToDelete._id
+      );
+
+      await refreshSelectedClass();
+
+      setDeleteSectionModalOpen(false);
+      setSectionToDelete(null);
+
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        "Failed to delete section.";
+
+      alert(message);
+    } finally {
+      setDeletingSection(false);
+    }
+  };
 
   const refreshSelectedClass = async () => {
-
-  if (!selectedClass?._id) return;
-
-  const response = await classService.getClassById(
-    selectedClass._id
-  );
-
-  setSelectedClass(response.data.data);
+  if (!selectedClass || !selectedClass._id) return;
+  try {
+    const response =
+      await classService.getClassById(
+        selectedClass._id
+      );
+    const data = response.data.data;
+    setSelectedClass({
+      ...data.class,
+      sections: data.sections,
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
+
   return (
     <ContentContainer>
       {/* ================= Header ================= */}
@@ -285,9 +342,18 @@ const ClassesPage = () => {
 
             <SectionList
                 sections={selectedClass.sections || []}
-                onAddSection={() => setSectionModalOpen(true)}
-                onEditSection={() => {}}
-                onDeleteSection={() => {}}
+                onAddSection={() => {
+                    setEditingSection(null);
+                    setSectionModalOpen(true);
+                }}
+                onEditSection={(section) => {
+                  setEditingSection(section);
+                  setSectionModalOpen(true);
+                }}
+                onDeleteSection={(section) => {
+                  setSectionToDelete(section);
+                  setDeleteSectionModalOpen(true);
+                }}
             />
           </div>
         )}
@@ -400,11 +466,67 @@ const ClassesPage = () => {
           title="Add Section"
       >
       <SectionForm
+        initialValues={editingSection}
         loading={sectionLoading}
-        onSubmit={handleCreateSection}
-        onCancel={() => setSectionModalOpen(false)}
+        onSubmit={
+          editingSection
+            ? handleUpdateSection
+            : handleCreateSection
+        }
+        onCancel={() => {
+          setSectionModalOpen(false);
+          setEditingSection(null);
+        }}
       />
       </Modal>
+      <Modal
+        isOpen={deleteSectionModalOpen}
+        onClose={() => {
+            setDeleteSectionModalOpen(false);
+            setSectionToDelete(null);
+        }}
+        title="Delete Section"
+        size="sm"
+    >
+        <div className="space-y-6">
+            <div>
+                <h3 className="text-lg font-semibold">
+                    Delete Confirmation
+                </h3>
+                <p className="mt-2 text-sm text-slate-600">
+                    Are you sure you want to delete
+                    <span className="font-semibold">
+                        {" "}
+                        {sectionToDelete?.name}
+                    </span>
+                    ?
+                </p>
+                <p className="mt-2 text-sm text-red-500">
+                    This action cannot be undone.
+                </p>
+            </div>
+            <div className="flex justify-end gap-3">
+                <Button
+                    variant="secondary"
+                    onClick={() => {
+                        setDeleteSectionModalOpen(false);
+                        setSectionToDelete(null);
+                    }}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    disabled={deletingSection}
+                    onClick={handleDeleteSection}
+                >
+                    {deletingSection
+                        ? "Deleting..."
+                        : "Delete"}
+                </Button>
+            </div>
+        </div>
+      </Modal>
+
     </ContentContainer>
   );
 };

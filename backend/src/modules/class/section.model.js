@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 const sectionSchema = new mongoose.Schema(
   {
     classId: {
@@ -49,9 +48,11 @@ sectionSchema.index(
   },
   {
     unique: true,
+    partialFilterExpression: {
+      isDeleted: false,
+    },
   }
 );
 
 const Section = mongoose.model("Section", sectionSchema);
-
 export default Section;

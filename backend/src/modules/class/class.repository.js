@@ -72,6 +72,28 @@ class ClassRepository {
     });
   }
 
+  async findDeletedClass(name, academicYear) {
+    return await Class.findOne({
+      name,
+      academicYear,
+      isDeleted: true,
+    });
+  }
+
+  async restoreClass(id, data) {
+    return await Class.findByIdAndUpdate(
+      id,
+      {
+        ...data,
+        isDeleted: false,
+        isActive: true,
+      },
+      {
+        returnDocument: "after",
+        runValidators: true,
+      }
+    );
+  }
   // ==========================
   // SECTION
   // ==========================
@@ -81,6 +103,13 @@ class ClassRepository {
       name,
       isDeleted: false,
     });
+  }
+  async findDeletedSectionByName(classId, name){
+    return await Section.findOne({
+        classId,
+        name,
+        isDeleted: true,
+    })
   }
   async hasSections(classId) {
     return await Section.exists({
@@ -135,7 +164,19 @@ class ClassRepository {
       }
     );
   }
-
+  async restoreSection(id, data){
+    return await Section.findByIdAndUpdate(
+      id,
+      {
+        ...data,
+        isDeleted: false,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+  }
   async countSections(classId) {
     return await Section.countDocuments({
       classId,

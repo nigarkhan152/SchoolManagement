@@ -1,11 +1,12 @@
 import {
   GraduationCap,
-  MoreVertical,
   Users,
+  Pencil,
+  Trash2
 } from "lucide-react";
 
 import Badge from "../common/Badge";
-
+import ActionMenu from "../common/ActionMenu";
 const SectionCard = ({
   section,
   onEdit,
@@ -69,15 +70,22 @@ const SectionCard = ({
 
         {/* Actions */}
 
-        <button
-          onClick={() => onEdit(section)}
-          className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
-        >
-          <MoreVertical size={18} />
-        </button>
-
+        <ActionMenu
+            items={[
+                {
+                label: "Edit Section",
+                icon: <Pencil size={16} />,
+                onClick: () => onEdit(section),
+                },
+                {
+                label: "Delete Section",
+                icon: <Trash2 size={16} />,
+                danger: true,
+                onClick: () => onDelete(section),
+                },
+            ]}
+            />
       </div>
-
     </div>
   );
 };
