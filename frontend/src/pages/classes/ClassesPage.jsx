@@ -13,6 +13,8 @@ import Modal from "../../components/common/Modal";
 import ClassForm from "../../components/forms/ClassForm";
 import SectionList from "../../components/sections/SectionList";
 import { useState } from "react";
+import classService from "../../services/classService";
+import SectionForm from "../../components/sections/SectionForm";
 import { BookOpen, GraduationCap, Users, BarChart3 } from "lucide-react";
 const ClassesPage = () => {
   const {
@@ -45,6 +47,43 @@ const ClassesPage = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [classToDelete, setClassToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [sectionModalOpen, setSectionModalOpen] = useState(false);
+  const [sectionLoading, setSectionLoading] = useState(false);
+  const handleCreateSection = async (formData) => {
+    try {
+      setSectionLoading(true);
+
+      await classService.createSection(
+        selectedClass._id,
+        formData
+      );
+
+      await refreshSelectedClass();
+
+      setSectionModalOpen(false);
+
+    } catch (error) {
+      const message =
+          error.response?.data?.message ||
+          "Something went wrong.";
+
+      alert(message);
+  }
+    finally {
+      setSectionLoading(false);
+    }
+  };
+
+  const refreshSelectedClass = async () => {
+
+  if (!selectedClass?._id) return;
+
+  const response = await classService.getClassById(
+    selectedClass._id
+  );
+
+  setSelectedClass(response.data.data);
+};
   return (
     <ContentContainer>
       {/* ================= Header ================= */}
@@ -244,63 +283,9 @@ const ClassesPage = () => {
 
             {/* Sections */}
 
-            {/* <div>
-              <h3 className="mb-3 text-lg font-semibold">
-                Sections
-              </h3>
-
-              {selectedClass.sections?.length ? (
-
-                <div className="space-y-3">
-
-                  {selectedClass.sections.map((section) => (
-
-                    <div
-                      key={section._id}
-                      className="flex items-center justify-between rounded-xl border p-4"
-                    >
-                      <div>
-
-                        <p className="font-semibold">
-                          {section.name}
-                        </p>
-
-                        <p className="text-sm text-slate-500">
-                          Capacity : {section.capacity}
-                        </p>
-
-                      </div>
-
-                      <Badge
-                        variant={
-                          section.isActive
-                            ? "success"
-                            : "danger"
-                        }
-                      >
-                        {section.isActive
-                          ? "Active"
-                          : "Inactive"}
-                      </Badge>
-
-                    </div>
-
-                  ))}
-
-                </div>
-
-              ) : (
-
-                <div className="rounded-xl border border-dashed p-8 text-center text-slate-500">
-                  No Sections Available
-                </div>
-
-              )}
-
-            </div> */}
             <SectionList
                 sections={selectedClass.sections || []}
-                onAddSection={() => {}}
+                onAddSection={() => setSectionModalOpen(true)}
                 onEditSection={() => {}}
                 onDeleteSection={() => {}}
             />
@@ -409,7 +394,17 @@ const ClassesPage = () => {
 
       </div>
       </Modal>
-    
+      <Modal
+          isOpen={sectionModalOpen}
+          onClose={() => setSectionModalOpen(false)}
+          title="Add Section"
+      >
+      <SectionForm
+        loading={sectionLoading}
+        onSubmit={handleCreateSection}
+        onCancel={() => setSectionModalOpen(false)}
+      />
+      </Modal>
     </ContentContainer>
   );
 };

@@ -163,17 +163,29 @@ class ClassService {
     createSectionValidation(data);
 
     const classData =
-      await ClassRepository.getClassById(
-        data.classId
-      );
+        await ClassRepository.getClassById(data.classId);
 
     if (!classData) {
-      throw new Error("Class not found");
+        throw new Error("Class not found");
     }
 
-    return await ClassRepository.createSection(
-      data
-    );
+    const sectionName = data.name.trim().toUpperCase();
+
+    const existingSection =
+        await ClassRepository.findSectionByName(
+            data.classId,
+            sectionName
+        );
+    
+    if (existingSection) {
+        throw new Error(
+            "Section already exists in this class."
+        );
+    }
+    
+    data.name = sectionName;
+
+    return await ClassRepository.createSection(data);
   }
 
   async updateSection(id, data) {
