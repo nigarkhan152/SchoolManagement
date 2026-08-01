@@ -15,7 +15,7 @@ import SectionList from "../../components/sections/SectionList";
 import { useState } from "react";
 import classService from "../../services/classService";
 import SectionForm from "../../components/sections/SectionForm";
-import { BookOpen, GraduationCap, Users, BarChart3, Form } from "lucide-react";
+import { BookOpen, GraduationCap, Users, BarChart3, Form, DoorOpen, CalendarDays } from "lucide-react";
 const ClassesPage = () => {
   const {
     classes,
@@ -275,67 +275,117 @@ const ClassesPage = () => {
           <div className="space-y-6">
 
             {/* Header */}
-
-            <div className="rounded-xl bg-slate-50 p-5">
-
-              <h2 className="text-2xl font-bold">
-                {selectedClass.name}
-              </h2>
-
-              <p className="mt-2 text-slate-600">
-                {selectedClass.description || "-"}
-              </p>
-
-              <div className="mt-4">
-                <Badge
-                  variant={
-                    selectedClass.isActive
-                      ? "success"
-                      : "danger"
-                  }
-                >
-                  {selectedClass.isActive
-                    ? "Active"
-                    : "Inactive"}
-                </Badge>
+        
+        <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-blue-50 via-white to-white p-6">
+          <div className="flex items-start gap-4">
+              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-100 shadow-sm">
+                  <GraduationCap
+                      size={36}
+                      className="text-blue-600"
+                  />
               </div>
+              <div className="flex-1">
+                  <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
+                      {selectedClass.name} 
+                  </h2>
+                  <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
+                      {selectedClass.description || "No description"}
+                  </p>
 
-            </div>
+                  <div className="mt-5 flex items-center gap-3">
+
+                      <Badge
+                          variant={
+                              selectedClass.isActive
+                                  ? "success"
+                                  : "danger"
+                          }
+                      >
+                          {selectedClass.isActive
+                              ? "Active"
+                              : "Inactive"}
+                      </Badge>
+
+                  </div>
+              </div>
+          </div>
+        </div>
 
             {/* Details */}
 
             <div className="grid gap-4">
 
-              <div className="rounded-xl border p-4">
-                <p className="text-sm text-slate-500">
+              {/* <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Academic Year
                 </p>
 
-                <h4 className="mt-1 font-semibold">
+                <h4 className="mt-2 text-xl font-bold text-slate-800">
+                  {selectedClass.academicYear || "-"}
+                </h4>
+              </div> */}
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+                <div className="mb-3 flex items-center gap-2">
+                  <CalendarDays
+                    size={18}
+                    className="text-blue-600"
+                  />
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Academic Year
+                  </p>
+                </div>
+                <h4 className="text-xl font-bold text-slate-800">
                   {selectedClass.academicYear || "-"}
                 </h4>
               </div>
 
-              <div className="rounded-xl border p-4">
-                <p className="text-sm text-slate-500">
+              {/* <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Room Number
                 </p>
 
-                <h4 className="mt-1 font-semibold">
+                <h4 className="mt-2 text-xl font-bold text-slate-800">
+                  {selectedClass.roomNumber || "-"}
+                </h4>
+              </div> */}
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+                <div className="mb-3 flex items-center gap-2">
+                  <DoorOpen
+                    size={18}
+                    className="text-violet-600"
+                  />
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Room Number
+                  </p>
+                </div>
+                <h4 className="text-xl font-bold text-slate-800">
                   {selectedClass.roomNumber || "-"}
                 </h4>
               </div>
 
-              <div className="rounded-xl border p-4">
-                <p className="text-sm text-slate-500">
+              {/* <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Capacity
                 </p>
 
-                <h4 className="mt-1 font-semibold">
+                <h4 className="mt-2 text-xl font-bold text-slate-800">
+                  {selectedClass.capacity}
+                </h4>
+              </div> */}
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+                <div className="mb-3 flex items-center gap-2">
+                  <Users
+                    size={18}
+                    className="text-green-600"
+                  />
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Capacity
+                  </p>
+                </div>
+                <h4 className="text-xl font-bold text-slate-800">
                   {selectedClass.capacity}
                 </h4>
               </div>
-
             </div>
 
             {/* Sections */}

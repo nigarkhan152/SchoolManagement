@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-
+import { GraduationCap } from "lucide-react";
 const Drawer = ({
   isOpen,
   onClose,
@@ -72,14 +72,21 @@ const Drawer = ({
                 py-5
               "
             >
-              <div>
-                <h2 className="text-xl font-bold text-slate-800">
-                  {title}
-                </h2>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  View complete details
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">
+                  <GraduationCap
+                    size={24}
+                    className="text-blue-600"
+                  />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+                    {title}
+                  </h2>
+                  <p className="text-sm text-slate-500">
+                    View and manage class information
+                  </p>
+                </div>
               </div>
 
               <button
