@@ -68,10 +68,11 @@ const teacherSchema = new mongoose.Schema(
     },
 
     phone: {
-      type: String,
-      required: [true, "Phone number is required"],
-      unique: true,
-      trim: true,
+        type: String,
+        required: true,
+        trim: true,
+        unique: true,
+        match: [/^[6-9]\d{9}$/, "Invalid phone number"]
     },
 
     email: {
@@ -80,8 +81,8 @@ const teacherSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       lowercase: true,
+      match: [/\S+@\S+\.\S+/, "Invalid email"]
     },
-
     address: {
       street: {
         type: String,

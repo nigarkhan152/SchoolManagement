@@ -1,15 +1,23 @@
-const validate = (validator) => {
+const validate = (schema) => {
   return (req, res, next) => {
-    try {
-      validator(req.body);
-      next();
-    } catch (error) {
+    const { error, value } = schema.validate(req.body, {
+      abortEarly: false,
+      stripUnknown: true,
+    });
+
+    if (error) {
       return res.status(400).json({
         success: false,
-        message: error.message,
+        message: "Validation failed",
+        errors: error.details.map((err) => err.message),
       });
     }
+
+    // Use the sanitized data returned by Joi
+    req.body = value;
+
+    next();
   };
 };
 
-export default validate;
+module.exports = validate;

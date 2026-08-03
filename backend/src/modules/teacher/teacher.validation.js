@@ -1,106 +1,147 @@
-const Joi = require("joi");
+const createTeacherValidation = (data) => {
+  const {
+    employeeId,
+    firstName,
+    lastName,
+    gender,
+    dateOfBirth,
+    department,
+    qualification,
+    experience,
+    joiningDate,
+    salary,
+    phone,
+    email,
+    status,
+  } = data;
 
-const createTeacherSchema = Joi.object({
-  employeeId: Joi.string().trim().required().messages({
-    "string.empty": "Employee ID is required",
-    "any.required": "Employee ID is required",
-  }),
+  if (!employeeId) {
+    throw new Error("Employee ID is required");
+  }
 
-  firstName: Joi.string().trim().required().messages({
-    "string.empty": "First name is required",
-    "any.required": "First name is required",
-  }),
+  if (!firstName) {
+    throw new Error("First name is required");
+  }
 
-  lastName: Joi.string().trim().required().messages({
-    "string.empty": "Last name is required",
-    "any.required": "Last name is required",
-  }),
+  if (!lastName) {
+    throw new Error("Last name is required");
+  }
 
-  gender: Joi.string()
-    .valid("Male", "Female", "Other")
-    .required()
-    .messages({
-      "any.only": "Gender must be Male, Female or Other",
-      "any.required": "Gender is required",
-    }),
+  if (!gender) {
+    throw new Error("Gender is required");
+  }
 
-  dateOfBirth: Joi.date().required().messages({
-    "date.base": "Invalid Date of Birth",
-    "any.required": "Date of Birth is required",
-  }),
+  if (!["Male", "Female", "Other"].includes(gender)) {
+    throw new Error("Invalid gender");
+  }
 
-  photo: Joi.string().allow("", null),
+  if (!dateOfBirth) {
+    throw new Error("Date of Birth is required");
+  }
 
-  department: Joi.string().trim().required().messages({
-    "string.empty": "Department is required",
-    "any.required": "Department is required",
-  }),
+  if (!department) {
+    throw new Error("Department is required");
+  }
 
-  qualification: Joi.string().trim().required().messages({
-    "string.empty": "Qualification is required",
-    "any.required": "Qualification is required",
-  }),
+  if (!qualification) {
+    throw new Error("Qualification is required");
+  }
 
-  experience: Joi.number().min(0).required().messages({
-    "number.base": "Experience must be a number",
-    "number.min": "Experience cannot be negative",
-    "any.required": "Experience is required",
-  }),
+  if (experience === undefined || experience === null) {
+    throw new Error("Experience is required");
+  }
 
-  joiningDate: Joi.date().required().messages({
-    "date.base": "Invalid Joining Date",
-    "any.required": "Joining Date is required",
-  }),
+  if (experience < 0) {
+    throw new Error("Experience cannot be negative");
+  }
 
-  salary: Joi.number().min(0).required().messages({
-    "number.base": "Salary must be a number",
-    "number.min": "Salary cannot be negative",
-    "any.required": "Salary is required",
-  }),
+  if (!joiningDate) {
+    throw new Error("Joining Date is required");
+  }
 
-  phone: Joi.string().trim().required().messages({
-    "string.empty": "Phone number is required",
-    "any.required": "Phone number is required",
-  }),
+  if (salary === undefined || salary === null) {
+    throw new Error("Salary is required");
+  }
 
-  email: Joi.string().email().trim().required().messages({
-    "string.email": "Invalid email address",
-    "string.empty": "Email is required",
-    "any.required": "Email is required",
-  }),
+  if (salary < 0) {
+    throw new Error("Salary cannot be negative");
+  }
 
-  address: Joi.object({
-    street: Joi.string().allow("", null),
-    city: Joi.string().allow("", null),
-    state: Joi.string().allow("", null),
-    country: Joi.string().allow("", null),
-    pincode: Joi.string().allow("", null),
-  }).optional(),
+  if (!phone) {
+    throw new Error("Phone number is required");
+  }
 
-  status: Joi.string()
-    .valid("Active", "Inactive", "On Leave")
-    .default("Active"),
-});
+  if (!email) {
+    throw new Error("Email is required");
+  }
 
-const updateTeacherSchema = createTeacherSchema.fork(
-  [
-    "employeeId",
-    "firstName",
-    "lastName",
-    "gender",
-    "dateOfBirth",
-    "department",
-    "qualification",
-    "experience",
-    "joiningDate",
-    "salary",
-    "phone",
-    "email",
-  ],
-  (schema) => schema.optional()
-);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-module.exports = {
-  createTeacherSchema,
-  updateTeacherSchema,
+  if (!emailRegex.test(email)) {
+    throw new Error("Invalid email address");
+  }
+
+  const phoneRegex = /^[6-9]\d{9}$/;
+
+  if (!phoneRegex.test(phone)) {
+    throw new Error("Invalid phone number");
+  }
+
+  if (
+    status &&
+    !["Active", "Inactive", "On Leave"].includes(status)
+  ) {
+    throw new Error("Invalid status");
+  }
+};
+
+const updateTeacherValidation = (data) => {
+  if (
+    data.gender &&
+    !["Male", "Female", "Other"].includes(data.gender)
+  ) {
+    throw new Error("Invalid gender");
+  }
+
+  if (
+    data.experience !== undefined &&
+    data.experience < 0
+  ) {
+    throw new Error("Experience cannot be negative");
+  }
+
+  if (
+    data.salary !== undefined &&
+    data.salary < 0
+  ) {
+    throw new Error("Salary cannot be negative");
+  }
+
+  if (data.email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(data.email)) {
+      throw new Error("Invalid email address");
+    }
+  }
+
+  if (data.phone) {
+    const phoneRegex = /^[6-9]\d{9}$/;
+
+    if (!phoneRegex.test(data.phone)) {
+      throw new Error("Invalid phone number");
+    }
+  }
+
+  if (
+    data.status &&
+    !["Active", "Inactive", "On Leave"].includes(data.status)
+  ) {
+    throw new Error("Invalid status");
+  }
+};
+
+export {
+  createTeacherValidation,
+  updateTeacherValidation,
 };
