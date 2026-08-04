@@ -12,7 +12,6 @@ const createTeacherValidation = (data) => {
     salary,
     phone,
     email,
-    status,
   } = data;
 
   if (!employeeId) {
@@ -31,10 +30,6 @@ const createTeacherValidation = (data) => {
     throw new Error("Gender is required");
   }
 
-  if (!["Male", "Female", "Other"].includes(gender)) {
-    throw new Error("Invalid gender");
-  }
-
   if (!dateOfBirth) {
     throw new Error("Date of Birth is required");
   }
@@ -51,20 +46,12 @@ const createTeacherValidation = (data) => {
     throw new Error("Experience is required");
   }
 
-  if (experience < 0) {
-    throw new Error("Experience cannot be negative");
-  }
-
   if (!joiningDate) {
     throw new Error("Joining Date is required");
   }
 
   if (salary === undefined || salary === null) {
     throw new Error("Salary is required");
-  }
-
-  if (salary < 0) {
-    throw new Error("Salary cannot be negative");
   }
 
   if (!phone) {
@@ -75,34 +62,22 @@ const createTeacherValidation = (data) => {
     throw new Error("Email is required");
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!emailRegex.test(email)) {
-    throw new Error("Invalid email address");
-  }
-
-  const phoneRegex = /^[6-9]\d{9}$/;
-
-  if (!phoneRegex.test(phone)) {
-    throw new Error("Invalid phone number");
+  if (
+    experience !== undefined &&
+    experience < 0
+  ) {
+    throw new Error("Experience cannot be negative");
   }
 
   if (
-    status &&
-    !["Active", "Inactive", "On Leave"].includes(status)
+    salary !== undefined &&
+    salary < 0
   ) {
-    throw new Error("Invalid status");
+    throw new Error("Salary cannot be negative");
   }
 };
 
 const updateTeacherValidation = (data) => {
-  if (
-    data.gender &&
-    !["Male", "Female", "Other"].includes(data.gender)
-  ) {
-    throw new Error("Invalid gender");
-  }
-
   if (
     data.experience !== undefined &&
     data.experience < 0
@@ -115,29 +90,6 @@ const updateTeacherValidation = (data) => {
     data.salary < 0
   ) {
     throw new Error("Salary cannot be negative");
-  }
-
-  if (data.email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(data.email)) {
-      throw new Error("Invalid email address");
-    }
-  }
-
-  if (data.phone) {
-    const phoneRegex = /^[6-9]\d{9}$/;
-
-    if (!phoneRegex.test(data.phone)) {
-      throw new Error("Invalid phone number");
-    }
-  }
-
-  if (
-    data.status &&
-    !["Active", "Inactive", "On Leave"].includes(data.status)
-  ) {
-    throw new Error("Invalid status");
   }
 };
 

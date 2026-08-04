@@ -4,19 +4,11 @@
  *   name: Teachers
  *   description: Teacher Management APIs
  */
+
 import express from "express";
-
-import {
-  createTeacher,
-  getTeachers,
-  getTeacherById,
-  updateTeacher,
-  deleteTeacher,
-  restoreTeacher,
-  getTeacherStatistics,
-} from "./teacher.controller.js";
-
-import validate from "../../middlewares/validate.js";
+import TeacherController from "./teacher.controller.js";
+import authMiddleware from "../../app/middlewares/auth.middleware.js";
+import validate from "../../app/middlewares/validate.middleware.js";
 
 import {
   createTeacherValidation,
@@ -26,93 +18,130 @@ import {
 const router = express.Router();
 
 /* ==========================
-   Teacher CRUD
+        TEACHER ROUTES
 ========================== */
+
 /**
  * @swagger
  * /teachers:
  *   post:
- *     summary: Create a new teacher
- *     tags:
- *       - Teachers
+ *     summary: Create Teacher
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Teacher'
+ *             type: object
+ *             required:
+ *               - employeeId
+ *               - firstName
+ *               - lastName
+ *               - gender
+ *               - department
+ *               - qualification
+ *               - experience
+ *               - joiningDate
+ *               - salary
+ *               - phone
+ *               - email
+ *             properties:
+ *               employeeId:
+ *                 type: string
+ *                 example: TCH001
+ *               firstName:
+ *                 type: string
+ *                 example: Neha
+ *               lastName:
+ *                 type: string
+ *                 example: Singh
+ *               gender:
+ *                 type: string
+ *                 example: Female
+ *               dateOfBirth:
+ *                 type: string
+ *                 example: 1995-05-20
+ *               department:
+ *                 type: string
+ *                 example: Mathematics
+ *               qualification:
+ *                 type: string
+ *                 example: M.Sc Mathematics
+ *               experience:
+ *                 type: integer
+ *                 example: 5
+ *               joiningDate:
+ *                 type: string
+ *                 example: 2022-06-15
+ *               salary:
+ *                 type: number
+ *                 example: 45000
+ *               phone:
+ *                 type: string
+ *                 example: 9876543210
+ *               email:
+ *                 type: string
+ *                 example: neha@gmail.com
+ *               status:
+ *                 type: string
+ *                 example: Active
  *     responses:
  *       201:
- *         description: Teacher created successfully
+ *         description: Teacher Created
  */
 router.post(
   "/",
+  authMiddleware,
   validate(createTeacherValidation),
-  createTeacher
+  TeacherController.createTeacher
 );
 
 /**
  * @swagger
  * /teachers:
  *   get:
- *     summary: Get all teachers
- *     tags:
- *       - Teachers
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *       - in: query
- *         name: search
- *         schema:
- *           type: string
- *       - in: query
- *         name: department
- *         schema:
- *           type: string
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
+ *     summary: Get All Teachers
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Teachers fetched successfully
+ *         description: List of Teachers
  */
-router.get("/", getTeachers);
-
-/* ==========================
-   Teacher Statistics
-========================== */
+router.get(
+  "/",
+  authMiddleware,
+  TeacherController.getTeachers
+);
 
 /**
  * @swagger
- * /teachers/statistics:
+ * /teachers/stats:
  *   get:
- *     summary: Get teacher dashboard statistics
- *     tags:
- *       - Teachers
+ *     summary: Teacher Dashboard Stats
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Teacher statistics fetched successfully
+ *         description: Teacher Statistics
  */
-router.get("/statistics", getTeacherStatistics);
-
-/* ==========================
-   Teacher Details
-========================== */
+router.get(
+  "/stats",
+  authMiddleware,
+  TeacherController.getTeacherStatistics
+);
 
 /**
  * @swagger
  * /teachers/{id}:
  *   get:
- *     summary: Get teacher by ID
- *     tags:
- *       - Teachers
+ *     summary: Get Teacher By Id
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -121,94 +150,85 @@ router.get("/statistics", getTeacherStatistics);
  *           type: string
  *     responses:
  *       200:
- *         description: Teacher details fetched successfully
- *       404:
- *         description: Teacher not found
+ *         description: Teacher Details
  */
-router.get("/:id", getTeacherById);
+router.get(
+  "/:id",
+  authMiddleware,
+  TeacherController.getTeacherById
+);
 
 /**
  * @swagger
  * /teachers/{id}:
  *   put:
- *     summary: Update an existing teacher
- *     tags:
- *       - Teachers
+ *     summary: Update Teacher
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: Teacher ID
  *         schema:
  *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Teacher'
  *     responses:
  *       200:
- *         description: Teacher updated successfully
- *       400:
- *         description: Validation error
- *       404:
- *         description: Teacher not found
+ *         description: Teacher Updated Successfully
  */
 router.put(
   "/:id",
+  authMiddleware,
   validate(updateTeacherValidation),
-  updateTeacher
+  TeacherController.updateTeacher
 );
 
 /**
  * @swagger
  * /teachers/{id}:
  *   delete:
- *     summary: Soft delete a teacher
- *     tags:
- *       - Teachers
+ *     summary: Delete Teacher
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: Teacher ID
  *         schema:
  *           type: string
  *     responses:
  *       200:
- *         description: Teacher deleted successfully
- *       404:
- *         description: Teacher not found
+ *         description: Teacher Deleted Successfully
  */
 router.delete(
   "/:id",
-  deleteTeacher
+  authMiddleware,
+  TeacherController.deleteTeacher
 );
 
 /**
  * @swagger
  * /teachers/{id}/restore:
  *   patch:
- *     summary: Restore a deleted teacher
- *     tags:
- *       - Teachers
+ *     summary: Restore Teacher
+ *     tags: [Teachers]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: Teacher ID
  *         schema:
  *           type: string
  *     responses:
  *       200:
- *         description: Teacher restored successfully
- *       404:
- *         description: Teacher not found
+ *         description: Teacher Restored Successfully
  */
 router.patch(
   "/:id/restore",
-  restoreTeacher
+  authMiddleware,
+  TeacherController.restoreTeacher
 );
 
 export default router;

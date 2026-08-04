@@ -1,20 +1,102 @@
-const Teacher = require("./teacher.model");
+import Teacher from "./teacher.model.js";
 
 class TeacherRepository {
-  async createTeacher(teacherData) {
-    return await Teacher.create(teacherData);
+  // ==========================
+  // CREATE
+  // ==========================
+
+  async createTeacher(data) {
+    return await Teacher.create(data);
   }
 
-  async findTeacherById(id) {
-    return await Teacher.findById(id);
+  // ==========================
+  // READ
+  // ==========================
+
+  async getTeacherById(id, includeDeleted = false) {
+  const filter = {
+    _id: id,
+  };
+
+  if (!includeDeleted) {
+    filter.isDeleted = false;
   }
 
-  async findActiveTeacherById(id) {
-    return await Teacher.findOne({
-      _id: id,
+  return await Teacher.findOne(filter).lean();
+}
+
+  async getTeachers(filters, skip, limit, sort) {
+    return await Teacher.find({
+      ...filters,
+      isDeleted: false,
+    })
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+  }
+
+  async countTeachers(filters) {
+    return await Teacher.countDocuments({
+      ...filters,
       isDeleted: false,
     });
   }
+
+  // ==========================
+  // UPDATE
+  // ==========================
+
+  async updateTeacher(id, data) {
+    return await Teacher.findOneAndUpdate(
+      {
+        _id: id,
+        isDeleted: false,
+      },
+      data,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+  }
+
+  // ==========================
+  // DELETE / RESTORE
+  // ==========================
+
+  async deleteTeacher(id) {
+    return await Teacher.findOneAndUpdate(
+      {
+        _id: id,
+        isDeleted: false,
+      },
+      {
+        isDeleted: true,
+      },
+      {
+        new: true,
+      }
+    );
+  }
+
+  async restoreTeacher(id, data = {}) {
+    return await Teacher.findByIdAndUpdate(
+      id,
+      {
+        ...data,
+        isDeleted: false,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+  }
+
+  // ==========================
+  // DUPLICATE CHECKS
+  // ==========================
 
   async findTeacherByEmployeeId(employeeId) {
     return await Teacher.findOne({
@@ -22,6 +104,14 @@ class TeacherRepository {
       isDeleted: false,
     });
   }
+
+  async findDeletedTeacherByEmployeeId(employeeId) {
+    return await Teacher.findOne({
+      employeeId,
+      isDeleted: true,
+    });
+  }
+
   async findTeacherByEmployeeIdExcludingId(employeeId, id) {
     return await Teacher.findOne({
       employeeId,
@@ -36,6 +126,7 @@ class TeacherRepository {
       isDeleted: false,
     });
   }
+
   async findTeacherByEmailExcludingId(email, id) {
     return await Teacher.findOne({
       email,
@@ -43,12 +134,14 @@ class TeacherRepository {
       _id: { $ne: id },
     });
   }
+
   async findTeacherByPhone(phone) {
     return await Teacher.findOne({
       phone,
       isDeleted: false,
     });
   }
+
   async findTeacherByPhoneExcludingId(phone, id) {
     return await Teacher.findOne({
       phone,
@@ -56,66 +149,45 @@ class TeacherRepository {
       _id: { $ne: id },
     });
   }
-  async exists(filter) {
-    return await Teacher.exists(filter);
-  }
-  async getTeachers(filter = {}, options = {}) {
-    const { page = 1, limit = 10 } = options;
 
-    const skip = (page - 1) * limit;
+  // ==========================
+  // STATISTICS
+  // ==========================
 
-    const teachers = await Teacher.find(filter)
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 });
+  async getStats() {
+    const [
+      totalTeachers,
+      activeTeachers,
+      inactiveTeachers,
+      onLeaveTeachers,
+    ] = await Promise.all([
+      Teacher.countDocuments({
+        isDeleted: false,
+      }),
 
-    const total = await Teacher.countDocuments(filter);
+      Teacher.countDocuments({
+        isDeleted: false,
+        status: "Active",
+      }),
+
+      Teacher.countDocuments({
+        isDeleted: false,
+        status: "Inactive",
+      }),
+
+      Teacher.countDocuments({
+        isDeleted: false,
+        status: "On Leave",
+      }),
+    ]);
 
     return {
-      teachers,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
+      totalTeachers,
+      activeTeachers,
+      inactiveTeachers,
+      onLeaveTeachers,
     };
   }
-  async countTeachers(filter = {}) {
-    return await Teacher.countDocuments(filter);
-  }
-
-  async updateTeacher(id, updateData) {
-    return await Teacher.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true,
-    });
-  }
-
-  async softDeleteTeacher(id) {
-    return await Teacher.findByIdAndUpdate(
-      id,
-      {
-        isDeleted: true,
-      },
-      {
-        new: true,
-      }
-    );
-  }
-
-  async restoreTeacher(id) {
-    return await Teacher.findByIdAndUpdate(
-      id,
-      {
-        isDeleted: false,
-      },
-      {
-        new: true,
-      }
-    );
-  }
-
-  async getDeletedTeachers(filter = {}, options = {}) {
-    }
 }
 
-module.exports = new TeacherRepository();
+export default new TeacherRepository();

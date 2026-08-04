@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const teacherSchema = new mongoose.Schema(
   {
@@ -68,21 +68,22 @@ const teacherSchema = new mongoose.Schema(
     },
 
     phone: {
-        type: String,
-        required: true,
-        trim: true,
-        unique: true,
-        match: [/^[6-9]\d{9}$/, "Invalid phone number"]
+      type: String,
+      required: [true, "Phone number is required"],
+      trim: true,
+      unique: true,
+      match: [/^[6-9]\d{9}$/, "Invalid phone number"],
     },
 
     email: {
       type: String,
       required: [true, "Email is required"],
-      unique: true,
       trim: true,
       lowercase: true,
-      match: [/\S+@\S+\.\S+/, "Invalid email"]
+      unique: true,
+      match: [/\S+@\S+\.\S+/, "Invalid email"],
     },
+
     address: {
       street: {
         type: String,
@@ -121,13 +122,51 @@ const teacherSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-teacherSchema.index({ employeeId: 1 }, { unique: true });
-teacherSchema.index({ email: 1 }, { unique: true });
-teacherSchema.index({ phone: 1 }, { unique: true });
+
+/* ==========================
+   Indexes
+========================== */
+
+teacherSchema.index(
+  { employeeId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      isDeleted: false,
+    },
+  }
+);
+
+teacherSchema.index(
+  { email: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      isDeleted: false,
+    },
+  }
+);
+
+teacherSchema.index(
+  { phone: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      isDeleted: false,
+    },
+  }
+);
+
 teacherSchema.index({ firstName: 1 });
+
 teacherSchema.index({ lastName: 1 });
+
 teacherSchema.index({ department: 1 });
+
 teacherSchema.index({ status: 1 });
+
 teacherSchema.index({ isDeleted: 1 });
 
-module.exports = mongoose.model("Teacher", teacherSchema);
+const Teacher = mongoose.model("Teacher", teacherSchema);
+
+export default Teacher;
