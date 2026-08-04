@@ -8,12 +8,6 @@
 import express from "express";
 import TeacherController from "./teacher.controller.js";
 import authMiddleware from "../../app/middlewares/auth.middleware.js";
-import validate from "../../app/middlewares/validate.middleware.js";
-
-import {
-  createTeacherValidation,
-  updateTeacherValidation,
-} from "./teacher.validation.js";
 
 const router = express.Router();
 
@@ -94,7 +88,6 @@ const router = express.Router();
 router.post(
   "/",
   authMiddleware,
-  validate(createTeacherValidation),
   TeacherController.createTeacher
 );
 
@@ -179,7 +172,6 @@ router.get(
 router.put(
   "/:id",
   authMiddleware,
-  validate(updateTeacherValidation),
   TeacherController.updateTeacher
 );
 

@@ -1,5 +1,10 @@
 import TeacherRepository from "./teacher.repository.js";
 
+import {
+  createTeacherValidation,
+  updateTeacherValidation,
+} from "./teacher.validation.js";
+
 class TeacherService {
 
   // ==========================
@@ -96,7 +101,7 @@ validateExperience(joiningDate, experience) {
 }
 
 validateSalary(salary) {
-  if (salary <= 0) {
+  if (salary < 0) {
     throw new Error(
       "Salary cannot be negative."
     );
@@ -238,25 +243,26 @@ buildTeacherFilter(query) {
   return filter;
 }
 
-async ensureTeacherExists(
-  id,
-  includeDeleted = false
-) {
-  const teacher =
-    await TeacherRepository.getTeacherById(
-      id,
-      includeDeleted
-    );
+  async ensureTeacherExists(
+    id,
+    includeDeleted = false
+  ) {
+    const teacher =
+      await TeacherRepository.getTeacherById(
+        id,
+        includeDeleted
+      );
 
-  if (!teacher) {
-    throw new Error(
-      "Teacher not found."
-    );
+    if (!teacher) {
+      throw new Error(
+        "Teacher not found."
+      );
+    }
+
+    return teacher;
   }
-
-  return teacher;
-}
   async createTeacher(teacherData) {
+    createTeacherValidation(teacherData);
     const normalizedData = this.normalizeTeacherData(teacherData);
 
     // Business Validations
@@ -335,6 +341,7 @@ async ensureTeacherExists(
     };
   }
   async updateTeacher(id, teacherData) {
+    updateTeacherValidation(teacherData);
     const teacher = await this.ensureTeacherExists(id);
 
     if (teacher.isDeleted) {
